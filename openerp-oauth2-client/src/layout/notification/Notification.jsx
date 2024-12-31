@@ -1,4 +1,4 @@
-import { useState } from "@hookstate/core";
+import { useState } from "react";
 import {
   Avatar,
   Box,

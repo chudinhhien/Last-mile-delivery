@@ -10,10 +10,11 @@ import { useEffect } from "react";
 import { Router } from "react-router-dom";
 import { Slide, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { menuState } from "state/MenuState";
-import { notificationState } from "state/NotificationState";
+import { MenuProvider, useMenuState } from "state/MenuState";
+import { useNotificationState } from "state/NotificationState";
 import { ReactComponent as Logo } from "./assets/icons/logo.svg";
 import history from "./history.js";
+import { RouteProvider } from "state/RouteState";
 
 export const theme = createTheme({
   typography: {
@@ -75,9 +76,20 @@ const AppLoading = (
 
 function App() {
   // TODO: Consider remove this logic!
+
+  const { setMenuState } = useMenuState(); // Lấy `setMenuState` từ context
+  const { setNotificationState, notificationState } = useNotificationState(); // Lấy từ NotificationContext nếu có
+
   const logout = () => {
-    menuState.permittedFunctions.set(new Set());
-    notificationState.merge({
+    // Đặt lại trạng thái của menu
+    setMenuState((prevState) => ({
+      ...prevState,
+      permittedFunctions: new Set(),
+    }));
+
+    // Đặt lại trạng thái thông báo
+    setNotificationState({
+      ...notificationState,
       notifications: undefined,
       numUnRead: 0,
       hasMore: false,
@@ -109,25 +121,27 @@ function App() {
       LoadingComponent={AppLoading}
       onEvent={onKeycloakEvent}
     >
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router history={history}>
-          <Routes />
-          <ToastContainer
-            position="bottom-center"
-            transition={Slide}
-            autoClose={3000}
-            limit={3}
-            hideProgressBar={true}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </Router>
-      </ThemeProvider>
+      <RouteProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router history={history}>
+            <Routes />
+            <ToastContainer
+              position="bottom-center"
+              transition={Slide}
+              autoClose={3000}
+              limit={3}
+              hideProgressBar={true}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+            />
+          </Router>
+        </ThemeProvider>
+      </RouteProvider>
     </ReactKeycloakProvider>
   );
 }

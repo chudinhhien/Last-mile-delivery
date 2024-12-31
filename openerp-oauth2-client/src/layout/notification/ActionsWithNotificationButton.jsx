@@ -1,4 +1,4 @@
-import { Downgraded, useState } from "@hookstate/core";
+import { Downgraded, useState } from "react";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Grow, IconButton } from "@mui/material";
@@ -142,7 +142,7 @@ function ActionsWithNotificationButton() {
   const { notifications, numUnRead } = useNotificationState();
 
   // Return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open.get());
+  const prevOpen = React.useRef(open);
   const anchorRef = React.useRef(null);
 
   // Action button

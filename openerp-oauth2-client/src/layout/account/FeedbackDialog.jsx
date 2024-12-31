@@ -107,7 +107,7 @@ const pageTitle = [
 
 const isEmpty = (str) => str.trim() === "";
 
-function FeedbackDialog({ open }) {
+function FeedbackDialog({ open, onClose }) {
   const [[page, direction], setPage] = useState([0, 0]);
   const [feature, setFeature] = useState("");
   const [detail, setDetail] = useState("");
@@ -122,7 +122,7 @@ function FeedbackDialog({ open }) {
 
   //
   const closeFeedbackDialog = () => {
-    open.set(false);
+    onClose();
     setPage([0, 0]);
     setFeature("");
     setDetail("");
@@ -165,7 +165,7 @@ function FeedbackDialog({ open }) {
   return (
     <>
       <CustomizedDialogs
-        open={open.get()}
+        open={open}
         handleClose={handleClose}
         contentTopDivider
         centerTitle

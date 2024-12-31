@@ -1,44 +1,53 @@
-import { createState, useState } from "@hookstate/core";
+import React, { createContext, useContext, useState } from "react";
 import { request } from "../api";
 
-export const menuState = createState({
-  isFetching: false,
-  isFetched: false,
-  permittedFunctions: new Set(),
-});
+const MenuContext = createContext();
 
-export function useMenuState() {
-  // This function wraps the state by an interface,
-  // i.e. the state link is not accessible directly outside of this module.
-  // The state for tasks in TasksState.ts exposes the state directly.
-  // Both options are valid and you need to use one or another,
-  // depending on your circumstances. Apply your engineering judgement
-  // to choose the best option. If unsure, exposing the state directly
-  // like it is done in the TasksState.ts is a safe bet.
-  return useState(menuState);
-}
+export function MenuProvider({ children }) {
+  const [menuState, setMenuState] = useState({
+    isFetching: false,
+    isFetched: false,
+    permittedFunctions: new Set(),
+  });
 
-export function fetchMenu() {
-  menuState.isFetching.set(true);
+  const fetchMenu = React.useCallback(() => {
+    console.log('fetchMenu called');
+    setMenuState((prevState) => {
+      if (prevState.isFetching) return prevState; // Tránh gọi không cần thiết
+      return { ...prevState, isFetching: true };
+    });
 
-  request(
-    "get",
-    "/entity-authorization/MENU_",
-    (res) => {
-      menuState.merge({
-        permittedFunctions: new Set(res.data),
-        isFetching: false,
-        isFetched: true,
-      });
-    },
-    {
-      onError: () => {
-        menuState.merge({
+    request(
+      "get",
+      "/entity-authorization/MENU_",
+      (res) => {
+        setMenuState({
           isFetching: false,
-          isFetched: false,
+          isFetched: true,
+          permittedFunctions: new Set(res.data),
         });
       },
-      401: () => {},
-    }
+      {
+        onError: () => {
+          setMenuState((prevState) => ({
+            ...prevState,
+            isFetching: false,
+            isFetched: false,
+          }));
+        },
+        401: () => {},
+      }
+    );
+  }, []);
+
+  const value = React.useMemo(
+    () => ({ menuState, setMenuState, fetchMenu }),
+    [menuState, fetchMenu]
   );
+
+  return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>;
+}
+
+export function useMenuState() {
+  return useContext(MenuContext);
 }

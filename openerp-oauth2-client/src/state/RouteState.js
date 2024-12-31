@@ -1,9 +1,23 @@
-import { createState, useState } from "@hookstate/core";
+import React, { createContext, useContext, useState } from "react";
 
-export const routeState = createState({
-  currentRoute: undefined, // When navigate to a public route from a private route, this state is previous route
-});
+// Tạo Context cho Route
+const RouteContext = createContext();
+
+export function RouteProvider({ children }) {
+  const [routeState, setRouteState] = useState({
+    currentRoute: undefined,
+  });
+
+  // Memoize context value
+  const value = React.useMemo(() => ({ routeState, setRouteState }), [routeState]);
+
+  return (
+    <RouteContext.Provider value={value}>
+      {children}
+    </RouteContext.Provider>
+  );
+}
 
 export function useRouteState() {
-  return useState(routeState);
+  return useContext(RouteContext);
 }

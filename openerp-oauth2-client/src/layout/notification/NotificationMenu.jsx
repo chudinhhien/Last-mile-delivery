@@ -5,14 +5,15 @@ import MenuList from "@mui/material/MenuList";
 import Paper from "@mui/material/Paper";
 import Popper from "@mui/material/Popper";
 import { ReactComponent as EmptyNotificationIcon } from "assets/icons/undraw_happy_announcement_ac67.svg";
-import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import "overlayscrollbars/css/OverlayScrollbars.css";
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
 import React, { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocation } from "react-router";
 import { notificationMenuWidth } from "./ActionsWithNotificationButton";
 import Notification from "./Notification";
 import NotificationTitle from "./NotificationTitle";
+import { useNotificationState } from "state/NotificationState";
 
 const styles = {
   paper: {
@@ -46,9 +47,7 @@ const NotificationsLoading = React.memo(({ quantity }) => {
 export default function NotificationMenu({
   open,
   anchorRef,
-  notifications,
   next,
-  hasMore,
 }) {
   const { pathname } = useLocation();
 
@@ -56,13 +55,16 @@ export default function NotificationMenu({
   const [displayInfiniteScroll, setDisplayInfiniteScroll] =
     React.useState(false);
 
+
+  const [notificationState, setNotificationState] = useNotificationState();
+  const { notifications = [], numUnRead, hasMore } = notificationState;
   // Use useCallback to prevent Notification rerender because callback is recreated.
   const handleClose = React.useCallback((event) => {
     if (anchorRef.current && anchorRef.current.contains(event.target)) {
       return;
     }
 
-    open.set(false);
+    setNotificationState((prevState) => ({ ...prevState, open: false }));
   }, []);
 
   function handleListKeyDown(event) {
@@ -75,15 +77,15 @@ export default function NotificationMenu({
   // This effect is used to make sure the OverlayScrollbarsComponent already exists in the DOM
   // before rendering InfiniteScroll
   useEffect(() => {
-    if (open.get() === true) setDisplayInfiniteScroll(true);
+    if (open === true) setDisplayInfiniteScroll(true);
     else setDisplayInfiniteScroll(false);
-  }, [open.get()]);
+  }, [open]);
 
   return (
     <Popper
       transition
       disablePortal
-      open={open.get()}
+      open={open}
       anchorEl={anchorRef.current}
       modifiers={[
         {
@@ -112,18 +114,16 @@ export default function NotificationMenu({
           <Paper elevation={0} sx={styles.paper}>
             <ClickAwayListener onClickAway={handleClose}>
               <MenuList
-                autoFocusItem={open.get()}
+                autoFocusItem={open}
                 id="menu-list-grow"
                 onKeyDown={handleListKeyDown}
                 style={{ padding: 0 }}
               >
-                <OverlayScrollbarsComponent
+                <SimpleBar
                   style={{
                     width: notificationMenuWidth,
                     maxHeight: `calc(100vh - 80px)`,
-                    // overscrollBehaviorY: "none", // To prevent tag <main> be scrolled when menu'scrollbar reach end
                   }}
-                  options={{ scrollbars: { autoHide: "scroll" } }}
                 >
                   {notifications.get() ? (
                     <>
@@ -185,7 +185,7 @@ export default function NotificationMenu({
                       </List>
                     </div>
                   )}
-                </OverlayScrollbarsComponent>
+                </SimpleBar>
               </MenuList>
             </ClickAwayListener>
           </Paper>

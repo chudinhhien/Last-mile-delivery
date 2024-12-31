@@ -1,4 +1,4 @@
-import { useState } from "@hookstate/core";
+import { useState } from 'react';
 import { Avatar, IconButton } from "@mui/material";
 import { useKeycloak } from "@react-keycloak/web";
 import randomColor from "randomcolor";
@@ -16,24 +16,24 @@ function AccountButton() {
   //
   const { keycloak } = useKeycloak();
 
-  const open = useState(false);
+  const [open, setOpen] = useState(false);
 
   // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open.get());
+  const prevOpen = React.useRef(open);
   const anchorRef = React.useRef(null);
 
   //
   const handleToggle = () => {
-    open.set((prevOpen) => !prevOpen);
+    setOpen((prevOpen) => !prevOpen);
   };
 
   useEffect(() => {
-    if (prevOpen.current === true && open.get() === false) {
+    if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
 
-    prevOpen.current = open.get();
-  }, [open.get()]);
+    prevOpen.current = open;
+  }, [open]);
 
   return (
     <>
@@ -43,7 +43,7 @@ function AccountButton() {
         ref={anchorRef}
         aria-haspopup="true"
         aria-label="account of current user"
-        aria-controls={open.get() ? menuId : undefined}
+        aria-controls={open ? menuId : undefined}
         onClick={handleToggle}
         sx={{ p: 1.5 }}
       >

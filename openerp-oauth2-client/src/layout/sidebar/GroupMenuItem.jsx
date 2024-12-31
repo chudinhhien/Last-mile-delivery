@@ -1,4 +1,4 @@
-import { Downgraded } from "@hookstate/core";
+import { Downgraded } from "react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Collapse, Icon, List, ListItem, ListItemText } from "@mui/material";
 import { whiteColor } from "assets/jss/material-dashboard-react";
@@ -94,10 +94,8 @@ function GroupMenuItem(props) {
   const location = useLocation();
 
   //
-  const menuState = useMenuState();
-  const permittedFunctions = menuState.permittedFunctions
-    .attach(Downgraded)
-    .get();
+  const { menuState } = useMenuState(); // Truy cập menuState từ context
+  const permittedFunctions = menuState.permittedFunctions;
 
   //
   const [expanded, setExpanded] = useState(false);
@@ -120,6 +118,7 @@ function GroupMenuItem(props) {
   };
 
   useEffect(() => {
+    console.log('GroupMenuItem useEffect called');
     checkSelected();
   }, [location.pathname]);
 

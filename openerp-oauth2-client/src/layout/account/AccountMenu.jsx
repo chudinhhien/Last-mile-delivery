@@ -1,4 +1,4 @@
-import { useState } from "@hookstate/core";
+import { useState } from "react";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import FeedbackIcon from "@mui/icons-material/Feedback";
@@ -74,7 +74,9 @@ export function AccountMenu(props) {
 
   //
   const { open, id, anchorRef, avatarBgColor } = props;
-  const openFeedback = useState(false);
+  const [openFeedback, setOpenFeedback] = useState(false);
+
+  const onClose = () => setOpenFeedback(false);
 
   // Menu
   const handleClose = (event) => {
@@ -152,7 +154,7 @@ export function AccountMenu(props) {
   return (
     <>
       <Popper
-        open={open.get()}
+        open={open}
         anchorEl={anchorRef.current}
         role={undefined}
         transition
@@ -184,7 +186,7 @@ export function AccountMenu(props) {
               <ClickAwayListener onClickAway={handleClose}>
                 <MenuList
                   id={id}
-                  autoFocusItem={open.get()}
+                  autoFocusItem={open}
                   onKeyDown={handleListKeyDown}
                 >
                   <li style={menuItemWrapperStyles}>
@@ -240,7 +242,7 @@ export function AccountMenu(props) {
           </Grow>
         )}
       </Popper>
-      <FeedbackDialog open={openFeedback} />
+      <FeedbackDialog open={openFeedback} onClose={onClose} />
     </>
   );
 }

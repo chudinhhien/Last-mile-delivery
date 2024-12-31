@@ -30,10 +30,13 @@ const styles = {
 
 function MainAppRouter(props) {
   const location = useLocation();
-  const notificationState = useNotificationState();
+  const [notificationState, setNotificationState] = useNotificationState();
 
   useEffect(() => {
-    notificationState.open.set(false);
+    setNotificationState((prevState) => ({
+      ...prevState,
+      open: false,
+    }));
   }, [location.pathname]);
 
   return (

@@ -22,9 +22,9 @@ const StyledAvatar = styled(Avatar)(({ theme, isOpen }) => ({
   },
   ...(isOpen
     ? {
-        backgroundColor: "#e7f3ff",
-        "&:hover": { backgroundColor: "rgba(187, 222, 251, 0.54)" },
-      }
+      backgroundColor: "#e7f3ff",
+      "&:hover": { backgroundColor: "rgba(187, 222, 251, 0.54)" },
+    }
     : {}),
 }));
 
@@ -56,58 +56,56 @@ const processNotificationsContent = (notifications) => {
 };
 
 function NotificationButton() {
-  const { open, notifications, numUnRead, hasMore } = useNotificationState();
+  const [notificationState, setNotificationState] = useNotificationState();
+  const { open, notifications, numUnRead, hasMore } = notificationState;
+
 
   // return focus to the button when we transitioned from !open -> open
-  const prevOpen = React.useRef(open.get());
+  const prevOpen = React.useRef(open);
   const anchorRef = React.useRef(null);
 
   //
-  const handleToggle = () => {
-    open.set((prevOpen) => !prevOpen);
-  };
+  const handleToggle = React.useCallback(() => {
+    setNotificationState((prevState) => {
+      if (prevState.open === !prevState.open) return prevState;
+      return { ...prevState, open: !prevState.open };
+    });
+  }, [setNotificationState]);
 
-  const fetchNotification = () => {
+
+  const fetchNotification = React.useCallback(() => {
     let fromId = null;
-    const fetchedNoties = notifications.get();
-
-    if (fetchedNoties && fetchedNoties.length > 0) {
-      console.log(
-        "fetchNotification, res = ",
-        fetchedNoties[fetchedNoties.length - 1]
-      );
-      fromId = fetchedNoties[fetchedNoties.length - 1].id;
+    if (notifications && notifications.length > 0) {
+      fromId = notifications[notifications.length - 1].id;
     }
 
     request(
       "get",
       `/notification?fromId=${fromId || ""}&page=${0}&size=${20}`,
       (res) => {
-        let data = res.data;
+        const data = res.data;
         const noties = processNotificationsContent(data.notifications.content);
 
-        if (fromId === null) {
-          notifications.set(noties);
-        } else {
-          notifications.merge(noties);
-        }
-
-        numUnRead.set(data.numUnRead);
-        hasMore.set(!data.notifications.last);
+        setNotificationState((prevState) => ({
+          ...prevState,
+          notifications: fromId === null ? noties : [...prevState.notifications, ...noties],
+          numUnRead: data.numUnRead,
+          hasMore: !data.notifications.last,
+        }));
       },
       { 401: () => {} }
     );
-  };
+  }, [notifications, setNotificationState]);
 
   React.useEffect(() => {
-    if (prevOpen.current === true && open.get() === false) {
+    if (prevOpen.current === true && open === false) {
       anchorRef.current.focus();
     }
 
-    prevOpen.current = open.get();
+    prevOpen.current = open;
 
-    // if (open.get() === false && numUnRead.get() > 0) numUnRead.set(0);
-  }, [open.get()]);
+    // if (open === false && numUnRead > 0) numUnRead.set(0);
+  }, [open]);
 
   React.useEffect(() => {
     // When user open multiple tabs, only one tab will receive events at any point of time,
@@ -148,7 +146,7 @@ function NotificationButton() {
                 return p;
               });
 
-              numUnRead.set(numUnRead.get() + 1);
+              numUnRead.set(numUnRead + 1);
               return;
             } else if (newCreatedTime === consideredCreatedTime) {
               return;
@@ -163,8 +161,7 @@ function NotificationButton() {
     const onError = function (e) {
       // When server SseEmitters timeout, it cause error
       console.error(
-        `EventSource connection state: ${
-          es.readyState
+        `EventSource connection state: ${es.readyState
         }, error occurred: ${JSON.stringify(e)}`
       );
 
@@ -260,16 +257,16 @@ function NotificationButton() {
         ref={anchorRef}
         aria-haspopup="true"
         aria-label="notification button"
-        aria-controls={open.get() ? "menu-list-grow" : undefined}
+        aria-controls={open ? "menu-list-grow" : undefined}
         onClick={handleToggle}
         sx={{ p: 1.5 }}
       >
-        <StyledAvatar alt="notification button" isOpen={open.get()}>
-          {open.get() ? (
+        <StyledAvatar alt="notification button" isOpen={open}>
+          {open ? (
             <NotificationsIcon color="primary" />
           ) : (
             <StyledBadge
-              badgeContent={numUnRead.get() < 10 ? numUnRead.get() : "+9"}
+              badgeContent={numUnRead < 10 ? numUnRead : "+9"}
               color="error"
             >
               <NotificationsIcon />
@@ -278,7 +275,6 @@ function NotificationButton() {
         </StyledAvatar>
       </IconButton>
       <NotificationMenu
-        open={open}
         anchorRef={anchorRef}
         notifications={notifications}
         next={fetchNotification}
