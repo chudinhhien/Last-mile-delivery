@@ -1,7 +1,6 @@
-package openerp.openerpresourceserver.controller.entity;
+package openerp.openerpresourceserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +10,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,8 +19,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "lmd_customer")
-public class Customer {
+@Table(name = "lmd_order")
+public class Order {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -29,21 +28,15 @@ public class Customer {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_login_id", nullable = false)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
     @JsonBackReference
-    private User user;
+    private Customer customer;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<Order> orders;
+    private BigDecimal weight;
 
-    private String name;
+    private BigDecimal volumn;
 
     private String status;
-
-    private String address;
-
-    private String location;
 
     @CreatedDate
     @Column(name = "created_stamp")

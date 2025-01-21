@@ -2,9 +2,9 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.controller.entity.Customer;
-import openerp.openerpresourceserver.controller.entity.Order;
-import openerp.openerpresourceserver.controller.entity.User;
+import openerp.openerpresourceserver.entity.Customer;
+import openerp.openerpresourceserver.entity.Order;
+import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.converter.CustomerConverter;
 import openerp.openerpresourceserver.dto.CustomerDTO;
 import openerp.openerpresourceserver.repo.CustomerRepo;

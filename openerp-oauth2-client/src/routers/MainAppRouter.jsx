@@ -13,6 +13,8 @@ import ShippingRequestDetailScreen from "views/ShippingRequestDetailScreen";
 import CustomerScreen from "views/CustomerScreen";
 import OrderScreen from "views/OrderScreen";
 import VehicleScreen from "views/VehicleScreen";
+import DepotScreen from "views/DepotScreen";
+import Dashboard from "views/Dashboard";
 
 
 const styles = {
@@ -43,7 +45,7 @@ function MainAppRouter(props) {
     <Layout>
       <Suspense fallback={<LinearProgress sx={styles.loadingProgress} />}>
         <Switch>
-          <Route component={() => <></>} exact path="/" />
+          <Route component={Dashboard} exact path="/" />
           <PrivateRoute component={DemoScreen} exact path="/demo" />
           <PrivateRoute component={TeacherRouter} path="/teacher" />
           <PrivateRoute component={ShippingRequestDetailScreen} path="/shipping-request-manage/:id" />
@@ -51,6 +53,7 @@ function MainAppRouter(props) {
           <PrivateRoute component={CustomerScreen} path="/customer" />
           <PrivateRoute component={OrderScreen} path="/order" />
           <PrivateRoute component={VehicleScreen} path="/vehicle" />
+          <PrivateRoute component={DepotScreen} path="/depot" />
           {/* <Route component={error} path="*" /> */}
           <Route component={NotFound} />
         </Switch>

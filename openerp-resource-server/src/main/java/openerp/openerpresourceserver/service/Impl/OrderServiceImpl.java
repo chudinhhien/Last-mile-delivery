@@ -2,7 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.controller.entity.Order;
+import openerp.openerpresourceserver.entity.Order;
 import openerp.openerpresourceserver.converter.OrderConverter;
 import openerp.openerpresourceserver.dto.OrderDTO;
 import openerp.openerpresourceserver.repo.OrderRepo;

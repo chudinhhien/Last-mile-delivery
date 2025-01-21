@@ -1,51 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Button } from '@mui/material';
 import { FaMap } from 'react-icons/fa6';
-import { deleteCustomer, fetchCustomers } from 'components/customer/CustomerAPI';
-import CustomerTable from 'components/customer/CustomerTable';
-import CustomerModal from 'components/customer/CustomerModal';
+import { deleteDepot, fetchDepots } from 'components/depot/DepotAPI';
+import DepotTable from 'components/depot/DepotTable';
+import DepotModal from 'components/depot/DepotModal';
 import MapModal from 'components/map/MapModal';
 
-
-const CustomerScreen = () => {
-  const [customers, setCustomers] = useState([]);
+const DepotScreen = () => {
+  const [depots, setDepots] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [openMap, setOpenMap] = useState(false);
-  const [newCustomer, setNewCustomer] = useState({ name: '', status: '', address: '' });
+  const [newDepot, setNewDepot] = useState({ name: '', status: '', address: '', location: '' });
   const [isEditing, setIsEditing] = useState(false);
 
-
   useEffect(() => {
-    const loadCustomers = async () => {
-      const data = await fetchCustomers();
-      setCustomers(data);
+    const loadDepots = async () => {
+      const data = await fetchDepots();
+      setDepots(data);
     };
-    loadCustomers();
+    loadDepots();
   }, []);
 
   const handleAddNew = () => {
-    setNewCustomer({ name: '', status: '', address: '' }); // Reset giá trị khách hàng mới
+    setNewDepot({ name: '', status: '', address: '', location: '' }); // Reset giá trị kho mới
     setIsEditing(false); // Đặt trạng thái là thêm mới
     setOpenModal(true); // Mở modal
   };
 
-  const handleEdit = (customer) => {
-    setNewCustomer(customer); // Đặt khách hàng cần chỉnh sửa
+  const handleEdit = (depot) => {
+    setNewDepot(depot); // Đặt kho cần chỉnh sửa
     setIsEditing(true); // Đặt trạng thái là chỉnh sửa
     setOpenModal(true); // Mở modal
   };
 
-  const handleDelete = async (customer) => {
-    if (window.confirm(`Bạn có chắc chắn muốn xóa khách hàng: ${customer.name}?`)) {
-      await deleteCustomer(customer.id);
-      setCustomers((prev) => prev.filter((c) => c.id !== customer.id));
+  const handleDelete = async (depot) => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa kho: ${depot.name}?`)) {
+      await deleteDepot(depot.id);
+      setDepots((prev) => prev.filter((d) => d.id !== depot.id));
     }
   };
 
   return (
     <div style={{ padding: '20px' }}>
       <Typography variant="h4" gutterBottom>
-        Quản lý khách hàng
+        Quản lý kho
       </Typography>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
         <Button
@@ -60,13 +58,13 @@ const CustomerScreen = () => {
           Thêm mới
         </Button>
       </div>
-      <CustomerTable customers={customers} onEdit={handleEdit} onDelete={handleDelete} />
-      <CustomerModal
+      <DepotTable depots={depots} onEdit={handleEdit} onDelete={handleDelete} />
+      <DepotModal
         open={openModal}
         onClose={() => setOpenModal(false)}
-        customer={newCustomer}
-        setCustomer={setNewCustomer}
-        setCustomers={setCustomers}
+        depot={newDepot}
+        setDepot={setNewDepot}
+        setDepots={setDepots}
         isEditing={isEditing} // Truyền trạng thái vào modal
       />
       <MapModal open={openMap} onClose={() => setOpenMap(false)} />
@@ -74,4 +72,4 @@ const CustomerScreen = () => {
   );
 };
 
-export default CustomerScreen;
+export default DepotScreen;

@@ -2,7 +2,7 @@ package openerp.openerpresourceserver.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import openerp.openerpresourceserver.controller.entity.User;
+import openerp.openerpresourceserver.entity.User;
 import openerp.openerpresourceserver.repo.UserRepo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @Log4j2
 @AllArgsConstructor(onConstructor_ = @Autowired)

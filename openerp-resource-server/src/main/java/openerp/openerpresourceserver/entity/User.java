@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.controller.entity;
+package openerp.openerpresourceserver.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,7 +11,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder

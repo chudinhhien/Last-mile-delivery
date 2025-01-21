@@ -28,12 +28,13 @@ import { student } from "./menuconfig/student";
 import { teacher } from "./menuconfig/teacher";
 import { user } from "./menuconfig/user";
 import {demo} from "./menuconfig/demo";
-import { FaBoxOpen, FaTruckFast } from "react-icons/fa6";
+import { FaBoxOpen, FaTruckFast, FaWarehouse } from "react-icons/fa6";
 import { FaUser } from "react-icons/fa";
 import { shippingRequestManage } from "./menuconfig/shippingRequestManage";
 import { customer } from "./menuconfig/customer";
 import { order } from "./menuconfig/order";
 import { vehicle } from "./menuconfig/vehicle";
+import { depot } from "./menuconfig/depot";
 import { MdDirectionsCar } from "react-icons/md";
 
 export const MENUS = [];
@@ -47,6 +48,7 @@ MENUS.push(shippingRequestManage)
 MENUS.push(customer)
 MENUS.push(order)
 MENUS.push(vehicle)
+MENUS.push(depot)
 
 export const menuIconMap = new Map();
 
@@ -85,5 +87,6 @@ menuIconMap.set("FaTruckFast",<FaTruckFast />)
 menuIconMap.set("FaUser", <FaUser size={20}/>);
 menuIconMap.set("FaBoxOpen", <FaBoxOpen size={20}/>);
 menuIconMap.set("MdDirectionsCar", <MdDirectionsCar size={20}/>);
+menuIconMap.set("FaWarehouse", <FaWarehouse size={20}/>);
 
 export const mapPathMenu = buildMapPathMenu(MENUS);

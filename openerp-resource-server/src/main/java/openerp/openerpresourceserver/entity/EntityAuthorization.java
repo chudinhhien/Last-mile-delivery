@@ -1,4 +1,4 @@
-package openerp.openerpresourceserver.controller.entity;
+package openerp.openerpresourceserver.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

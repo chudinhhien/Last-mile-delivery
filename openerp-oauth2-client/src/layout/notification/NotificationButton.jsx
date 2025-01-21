@@ -74,6 +74,11 @@ function NotificationButton() {
 
 
   const fetchNotification = React.useCallback(() => {
+    if (!config?.url?.API_URL) {
+      console.warn("API_URL is not defined. Skipping notification fetch.");
+      return;
+    }
+
     let fromId = null;
     if (notifications && notifications.length > 0) {
       fromId = notifications[notifications.length - 1].id;
@@ -93,7 +98,7 @@ function NotificationButton() {
           hasMore: !data.notifications.last,
         }));
       },
-      { 401: () => {} }
+      { 401: () => { } }
     );
   }, [notifications, setNotificationState]);
 
@@ -208,36 +213,44 @@ function NotificationButton() {
     // let count = 0;
 
     function setupEventSource() {
-      fetchNotification();
-
-      es = new EventSourcePolyfill(
-        `${config.url.API_URL}/notification/subscription`,
-        {
-          headers: {
-            Authorization: bearerAuth(keycloak.token),
-            // Count: count++,
-          },
+      if (!config?.url?.API_URL) {
+        console.warn("API_URL is not defined. Skipping EventSource setup.");
+        return;
+      }
+    
+      let es;
+      try {
+        es = new EventSourcePolyfill(`${config.url.API_URL}/notification/subscription`, {
+          headers: { Authorization: bearerAuth(keycloak.token) },
           heartbeatTimeout: 120000,
-        }
-      );
-
-      // In fact, this callback function is usually not fired as soon as the connection is opened,
-      // but fired when the first event is received. Don't know the reason but this doesn't matter
-      es.onopen = (event) => {
-        console.info(new Date(), `SSE opened`);
-        // reconnectFrequencySeconds = 1;
-      };
-
-      // This event only to keep sse connection alive
-      es.addEventListener(SSE_EVENTS.HEARTBEAT, handleHeartbeatEvent);
-
-      es.addEventListener(
-        SSE_EVENTS.NEW_NOTIFICATION,
-        handleNewNotificationEvent
-      );
-
-      es.onerror = onError;
+        });
+    
+        es.onopen = () => {
+          console.info("SSE connection opened.");
+        };
+    
+        es.addEventListener(SSE_EVENTS.HEARTBEAT, handleHeartbeatEvent);
+        es.addEventListener(SSE_EVENTS.NEW_NOTIFICATION, handleNewNotificationEvent);
+    
+        es.onerror = (e) => {
+          console.error("SSE error:", e);
+    
+          if (e.status === 404) {
+            console.warn("Endpoint not found (404). Stopping SSE.");
+            es.close();
+            return;
+          }
+    
+          if (e.target.readyState === EventSource.CONNECTING) {
+            console.warn("Reconnecting SSE...");
+          }
+        };
+      } catch (error) {
+        console.error("Failed to setup EventSource:", error);
+      }
     }
+    
+
 
     setupEventSource();
 
@@ -250,36 +263,44 @@ function NotificationButton() {
 
   return (
     <>
-      <IconButton
-        disableRipple
-        color="inherit"
-        component="span"
-        ref={anchorRef}
-        aria-haspopup="true"
-        aria-label="notification button"
-        aria-controls={open ? "menu-list-grow" : undefined}
-        onClick={handleToggle}
-        sx={{ p: 1.5 }}
-      >
-        <StyledAvatar alt="notification button" isOpen={open}>
-          {open ? (
-            <NotificationsIcon color="primary" />
-          ) : (
-            <StyledBadge
-              badgeContent={numUnRead < 10 ? numUnRead : "+9"}
-              color="error"
-            >
-              <NotificationsIcon />
-            </StyledBadge>
-          )}
-        </StyledAvatar>
-      </IconButton>
-      <NotificationMenu
-        anchorRef={anchorRef}
-        notifications={notifications}
-        next={fetchNotification}
-        hasMore={hasMore}
-      />
+      {config?.url?.API_URL ? (
+        <IconButton
+          disableRipple
+          color="inherit"
+          component="span"
+          ref={anchorRef}
+          aria-haspopup="true"
+          aria-label="notification button"
+          aria-controls={open ? "menu-list-grow" : undefined}
+          onClick={handleToggle}
+          sx={{ p: 1.5 }}
+        >
+          <StyledAvatar alt="notification button" isOpen={open}>
+            {open ? (
+              <NotificationsIcon color="primary" />
+            ) : (
+              <StyledBadge
+                badgeContent={numUnRead < 10 ? numUnRead : "+9"}
+                color="error"
+              >
+                <NotificationsIcon />
+              </StyledBadge>
+            )}
+          </StyledAvatar>
+        </IconButton>
+      ) : (
+        <IconButton disableRipple color="inherit" sx={{ p: 1.5 }}>
+          <NotificationsIcon />
+        </IconButton>
+      )}
+      {config?.url?.API_URL && (
+        <NotificationMenu
+          anchorRef={anchorRef}
+          notifications={notifications}
+          next={fetchNotification}
+          hasMore={hasMore}
+        />
+      )}
     </>
   );
 }
